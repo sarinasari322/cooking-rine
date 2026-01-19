@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>🍳 Cooking Rine Ultimate</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:'Poppins','Comic Sans MS',sans-serif;
+  background:linear-gradient(135deg,#ffcad4,#cdb4db,#bde0fe);
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.game{
+  width:1200px;
+  height:700px;
+  background:#fff;
+  border-radius:35px;
+  box-shadow:0 30px 70px rgba(0,0,0,.35);
+  padding:20px;
+}
+h1{
+  text-align:center;
+  margin:0;
+  font-size:44px;
+  color:#ff477e;
+}
+.top{
+  display:flex;
+  justify-content:space-between;
+  margin:10px 0;
+  font-size:20px;
+}
+.menu{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:14px;
+  margin:15px 0;
+}
+.menu button{
+  border:none;
+  border-radius:22px;
+  padding:16px;
+  font-size:18px;
+  background:linear-gradient(#ffe5ec,#ffc8dd);
+  cursor:pointer;
+  transition:.2s;
+}
+.menu button:hover{
+  transform:scale(1.1);
+  background:linear-gradient(#ffb3c6,#ff8fab);
+}
+.kitchen{
+  position:relative;
+  height:380px;
+  border-radius:30px;
+  background:linear-gradient(#caffbf,#bde0fe);
+  overflow:hidden;
+}
+.chef{
+  position:absolute;
+  left:90px;
+  bottom:40px;
+  width:130px;
+  height:180px;
+  background:#ffd166;
+  border-radius:65px 65px 35px 35px;
+  animation:chefMove .8s infinite alternate;
+}
+@keyframes chefMove{
+  from{transform:translateY(0) rotate(-4deg)}
+  to{transform:translateY(-15px) rotate(4deg)}
+}
+.pan{
+  position:absolute;
+  left:280px;
+  bottom:40px;
+  width:240px;
+  height:100px;
+  background:#495057;
+  border-radius:0 0 45px 45px;
+}
+.foodAnim{
+  position:absolute;
+  left:330px;
+  bottom:120px;
+  font-size:48px;
+  animation:foodPop 1s infinite alternate;
+}
+@keyframes foodPop{
+  from{transform:scale(1)}
+  to{transform:scale(1.15)}
+}
+.customer{
+  position:absolute;
+  right:140px;
+  bottom:40px;
+  width:120px;
+  height:170px;
+  background:#a2d2ff;
+  border-radius:60px 60px 35px 35px;
+  display:none;
+  animation:happy .6s infinite alternate;
+}
+@keyframes happy{
+  from{transform:scale(1)}
+  to{transform:scale(1.08)}
+}
+.control{
+  text-align:center;
+  margin-top:15px;
+}
+.control button{
+  padding:18px 60px;
+  font-size:22px;
+  border:none;
+  border-radius:35px;
+  background:#ff477e;
+  color:#fff;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+<div class="game">
+<h1>🍳 Cooking Rine Ultimate 🍰</h1>
+
+<div class="top">
+  <div>Menu: <span id="menu">-</span></div>
+  <div>⭐ <span id="star">0</span></div>
+  <div>🏆 Lv <span id="level">1</span></div>
+</div>
+
+<div class="menu">
+  <button onclick="choose('🍫','Kue Coklat')">🍫 Kue</button>
+  <button onclick="choose('🍩','Donat')">🍩 Donat</button>
+  <button onclick="choose('🧁','Cupcake')">🧁 Cupcake</button>
+  <button onclick="choose('🍦','Es Krim')">🍦 Es Krim</button>
+  <button onclick="choose('🍕','Pizza')">🍕 Pizza</button>
+  <button onclick="choose('🍳','Nasi Goreng')">🍳 Nasi</button>
+  <button onclick="choose('🍗','Ayam Goreng')">🍗 Ayam</button>
+  <button onclick="choose('🥕','Sup Sayur')">🥕 Sup</button>
+  <button onclick="choose('🍲','Bakso')">🍲 Bakso</button>
+  <button onclick="choose('🍞','Roti')">🍞 Roti</button>
+  <button onclick="choose('🍔','Burger')">🍔 Burger</button>
+  <button onclick="choose('🌭','Hotdog')">🌭 Hotdog</button>
+</div>
+
+<div class="kitchen">
+  <div class="chef"></div>
+  <div class="pan"></div>
+  <div class="foodAnim" id="food"></div>
+  <div class="customer" id="customer"></div>
+</div>
+
+<div class="control">
+  <button onclick="cook()">MASAK</button>
+</div>
+
+<audio id="bgm" loop src="https://cdn.pixabay.com/download/audio/2023/03/30/audio_3d3b1a1fa1.mp3"></audio>
+<audio id="eat" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4a4e33b5e7.mp3"></audio>
+</div>
+
+<script>
+let currentFood='', currentEmoji='';
+let star=0, level=1;
+
+const bgm=document.getElementById('bgm');
+bgm.volume=0.4;
+bgm.play();
+
+function choose(emoji,name){
+  currentFood=name;
+  currentEmoji=emoji;
+  document.getElementById('menu').textContent=name;
+  document.getElementById('food').textContent=emoji;
+}
+
+function cook(){
+  if(!currentFood){
+    alert('Pilih makanan dulu 🍽️');
+    return;
+  }
+  const customer=document.getElementById('customer');
+  customer.style.display='none';
+
+  setTimeout(()=>{
+    customer.style.display='block';
+    document.getElementById('eat').play();
+    star++;
+    if(star % 5 === 0) level++;
+    document.getElementById('star').textContent=star;
+    document.getElementById('level').textContent=level;
+  },1000);
+}
+</script>
+</body>
+  </html>
